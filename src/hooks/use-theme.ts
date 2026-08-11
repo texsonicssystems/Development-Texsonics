@@ -15,7 +15,7 @@ const applyTheme = (theme: Theme) => {
   const root = document.documentElement;
   root.classList.toggle("dark", theme === "dark");
   const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-  if (meta) meta.content = theme === "dark" ? "#0a0f16" : "#f4f8fb";
+  if (meta) meta.content = theme === "dark" ? "#0a0f16" : "#e7edf1";
   const scheme = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
   if (scheme) scheme.content = theme;
 };

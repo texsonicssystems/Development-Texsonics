@@ -11,7 +11,7 @@ import { robots } from "@/data/robots";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const seriesFilters = ["All", "AIR Series", "SCARA Series", "CS Series", "AMR Series"];
+const seriesFilters = ["All", "TS Series", "TSA Series", "TSCR Series", "AMR Series"];
 
 const robotsJsonLd = [
   {

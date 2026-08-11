@@ -10,7 +10,7 @@ export interface Robot {
   id: string;
   model: string;
   name: string;
-  series: "AIR Series" | "CS Series" | "AMR Series" | "SCARA Series";
+  series: "TS Series" | "TSCR Series" | "AMR Series" | "TSA Series";
   tagline: string;
   axes: string;
   payload: string;
@@ -23,14 +23,15 @@ export interface Robot {
   workingRange: { label: string; value: string }[];
   image: string | null;
   featured: boolean;
+  catalogue?: string;
 }
 
 export const robots: Robot[] = [
   {
-    id: "air4-560",
-    model: "AIR4-560",
-    name: "AIR4-560 Compact 6-Axis Robot",
-    series: "AIR Series",
+    id: "ts4-560",
+    model: "TS4-560",
+    name: "TS4-560 Compact 6-Axis Robot",
+    series: "TS Series",
     tagline: "High-speed 6-axis for 3C & small-part work",
     axes: "6-Axis",
     payload: "4 kg",
@@ -39,7 +40,7 @@ export const robots: Robot[] = [
     description:
       "Compact 6-axis industrial robot engineered for the 3C industry — assembly, handling, screwing and testing of small workpieces.",
     longDescription:
-      "The AIR4-560 is a compact 6-axis robot built for high-speed, high-precision operations in the 3C industry. Standard cycle time under 0.33 s, IP67 wrist protection and floor/wall/ceiling mounting let it drop into tight cells for assembly, screwing, handling and inspection. It ships pre-integrated with our own inCube20 controller.",
+      "The TS4-560 is a compact 6-axis robot built for high-speed, high-precision operations in the 3C industry. Standard cycle time under 0.33 s, IP67 wrist protection and floor/wall/ceiling mounting let it drop into tight cells for assembly, screwing, handling and inspection. It ships pre-integrated with our own inCube20 controller.",
     applications: ["3C Assembly & Testing", "High-Speed Handling", "Screwing", "Precision Inspection"],
     specs: [
       { label: "Axes", value: "6" },
@@ -62,12 +63,13 @@ export const robots: Robot[] = [
     ],
     image: air4Img,
     featured: true,
+    catalogue: "/catalogues/TS4-560.pdf",
   },
   {
-    id: "zdfx0808",
-    model: "AIR6-0808",
-    name: "AIR6-0808 Compact General-Purpose Robot",
-    series: "AIR Series",
+    id: "ts6-0808",
+    model: "TS6-0808",
+    name: "TS6-0808 Compact General-Purpose Robot",
+    series: "TS Series",
     tagline: "Small footprint. Big work envelope.",
     axes: "6-Axis",
     payload: "8 kg",
@@ -76,7 +78,7 @@ export const robots: Robot[] = [
     description:
       "Compact 6-axis robot for machine tending, pick-and-place, packaging and light assembly where floor space is tight.",
     longDescription:
-      "The AIR6-0808 is our compact general-purpose 6-axis platform — 8 kg payload in an 827 mm reach and only 42 kg body weight. IP65-rated, floor or ceiling mount, and small 200 × 300 mm base make it easy to drop into existing cells for CNC tending, pick-and-place, packaging and light assembly.",
+      "The TS6-0808 is our compact general-purpose 6-axis platform — 8 kg payload in an 827 mm reach and only 42 kg body weight. IP65-rated, floor or ceiling mount, and small 200 × 300 mm base make it easy to drop into existing cells for CNC tending, pick-and-place, packaging and light assembly.",
     applications: ["CNC Tending", "Pick & Place", "Packaging", "Light Assembly"],
     specs: [
       { label: "Axes", value: "6" },
@@ -99,12 +101,13 @@ export const robots: Robot[] = [
     ],
     image: zdfx0808Img,
     featured: true,
+    catalogue: "/catalogues/TS6-0808.pdf",
   },
   {
-    id: "zdft1215",
-    model: "AIR6-1215",
-    name: "AIR6-1215 General Purpose Robot",
-    series: "AIR Series",
+    id: "ts6-1215",
+    model: "TS6-1215",
+    name: "TS6-1215 General Purpose Robot",
+    series: "TS Series",
     tagline: "The 12 kg cell partner with 1.46 m reach",
     axes: "6-Axis",
     payload: "12 kg",
@@ -113,7 +116,7 @@ export const robots: Robot[] = [
     description:
       "Versatile 6-axis robot for CNC machine tending, loading/unloading, assembly and material handling with extended reach.",
     longDescription:
-      "The AIR6-1215 pairs a 12 kg payload with a wide 1463 mm activity radius, covering complex motion paths inside compact production layouts. Floor or ceiling mount, IP54 body with IP65 wrist, and our own controller keep integration simple across CNC tending, assembly and material handling cells.",
+      "The TS6-1215 pairs a 12 kg payload with a wide 1463 mm activity radius, covering complex motion paths inside compact production layouts. Floor or ceiling mount, IP54 body with IP65 wrist, and our own controller keep integration simple across CNC tending, assembly and material handling cells.",
     applications: ["CNC Machine Tending", "Loading / Unloading", "Assembly", "Material Handling", "Gluing & Dispensing"],
     specs: [
       { label: "Axes", value: "6" },
@@ -136,12 +139,13 @@ export const robots: Robot[] = [
     ],
     image: zdft1215Img,
     featured: true,
+    catalogue: "/catalogues/TS6-1215.pdf",
   },
   {
-    id: "zdgt2518",
-    model: "AIR6-2518",
-    name: "AIR6-2518 Heavy Payload Robot",
-    series: "AIR Series",
+    id: "ts6-2518",
+    model: "TS6-2518",
+    name: "TS6-2518 Heavy Payload Robot",
+    series: "TS Series",
     tagline: "25 kg payload. 1.8 m reach.",
     axes: "6-Axis",
     payload: "25 kg",
@@ -150,7 +154,7 @@ export const robots: Robot[] = [
     description:
       "Heavy-payload 6-axis robot for palletizing, press tending, foundry handling and large-part transfer.",
     longDescription:
-      "The AIR6-2518 is our heavy-payload platform for palletizing, foundry and stamping automation, press-to-press transfer and large-part handling. A rigid cast structure and high-torque drives deliver dependable cycle times at 25 kg with a 1808 mm envelope — at a price point imported brands can't match, with local support they can't offer.",
+      "The TS6-2518 is our heavy-payload platform for palletizing, foundry and stamping automation, press-to-press transfer and large-part handling. A rigid cast structure and high-torque drives deliver dependable cycle times at 25 kg with a 1808 mm envelope — at a price point imported brands can't match, with local support they can't offer.",
     applications: ["Palletizing", "Press / Stamping Tending", "Foundry & Die Casting", "Large Part Handling"],
     specs: [
       { label: "Axes", value: "6" },
@@ -173,12 +177,13 @@ export const robots: Robot[] = [
     ],
     image: zdgt2518Img,
     featured: true,
+    catalogue: "/catalogues/TS6-2518.pdf",
   },
   {
-    id: "kla700-scara",
-    model: "KLA700-6N",
-    name: "KLA700-6N SCARA Robot",
-    series: "SCARA Series",
+    id: "tsa700-6n",
+    model: "TSA700-6N",
+    name: "TSA700-6N SCARA Robot",
+    series: "TSA Series",
     tagline: "4-axis SCARA — 0.44 s cycle, 6 kg payload",
     axes: "4-Axis SCARA",
     payload: "6 kg",
@@ -187,7 +192,7 @@ export const robots: Robot[] = [
     description:
       "High-throughput 4-axis SCARA for assembly, loading/unloading, sorting, inspection and dispensing on flat workplanes.",
     longDescription:
-      "The KLA700-6N is a horizontal-multi-joint SCARA robot built for repetitive planar work — assembly, part loading, sorting, inspection and dispensing. 6 kg payload, 700 mm arm reach, 200 mm Z stroke and a fast 0.44 s standard cycle, in a compact 24 kg body. Integrated pneumatic and signal harness through the arm keeps end-effector tooling clean and repeatable.",
+      "The TSA700-6N is a horizontal-multi-joint SCARA robot built for repetitive planar work — assembly, part loading, sorting, inspection and dispensing. 6 kg payload, 700 mm arm reach, 200 mm Z stroke and a fast 0.44 s standard cycle, in a compact 24 kg body. Integrated pneumatic and signal harness through the arm keeps end-effector tooling clean and repeatable.",
     applications: ["Assembly", "Loading / Unloading", "Sorting", "Inspection", "Dispensing"],
     specs: [
       { label: "Axes", value: "4 (SCARA)" },
@@ -216,12 +221,13 @@ export const robots: Robot[] = [
     ],
     image: scaraImg,
     featured: true,
+    catalogue: "/catalogues/TSA700-6N.pdf",
   },
   {
-    id: "cr-05e-cobot",
-    model: "CR-05E",
-    name: "CR-05E Collaborative Robot",
-    series: "CS Series",
+    id: "tscr-05e",
+    model: "TSCR-05E",
+    name: "TSCR-05E Collaborative Robot",
+    series: "TSCR Series",
     tagline: "Works with people, not behind fences",
     axes: "6-Axis",
     payload: "5 kg",
@@ -230,7 +236,7 @@ export const robots: Robot[] = [
     description:
       "Collaborative 6-axis cobot with harmonic-drive joints and hand-guided teaching — deployable in days, not months.",
     longDescription:
-      "The CR-05E collaborative robot brings automation to workspaces shared with people. Harmonic-drive joints (Laifual Drive-based), hand-guided teaching and safety-rated monitored stop let it run fence-free machine tending, assembly, testing and packaging cells. A compact 1052 mm build height and 138 × 138 mm base make it easy to place beside operators on existing benches.",
+      "The TSCR-05E collaborative robot brings automation to workspaces shared with people. Harmonic-drive joints, hand-guided teaching and safety-rated monitored stop let it run fence-free machine tending, assembly, testing and packaging cells. A compact 1052 mm build height and 138 × 138 mm base make it easy to place beside operators on existing benches.",
     applications: ["Fence-free Machine Tending", "Assembly", "Testing & Inspection", "Packaging"],
     specs: [
       { label: "Axes", value: "6" },
@@ -254,6 +260,7 @@ export const robots: Robot[] = [
     ],
     image: cobotImg,
     featured: true,
+    catalogue: "/catalogues/TSCR-05E.pdf",
   },
   {
     id: "amr-300",
@@ -289,6 +296,7 @@ export const robots: Robot[] = [
     ],
     image: amrImg,
     featured: true,
+    catalogue: "/catalogues/AMR-300.pdf",
   },
 ];
 

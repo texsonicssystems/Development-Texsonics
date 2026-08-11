@@ -178,13 +178,24 @@ const RobotDetail = () => {
                   </span>
                   <ArrowRight className="relative z-10 w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:text-background" />
                 </Link>
-                <Link
-                  to="/downloads"
-                  className="group flex-1 inline-flex items-center justify-center gap-3 border border-border text-foreground font-display font-semibold uppercase tracking-wider text-sm px-8 py-4 hover:border-primary hover:text-primary transition-colors duration-300"
-                >
-                  Download Brochure
-                  <ArrowUpRight className="w-4 h-4" />
-                </Link>
+                {robot.catalogue ? (
+                  <a
+                    href={robot.catalogue}
+                    download={`Texsonics-${robot.model}.pdf`}
+                    className="group flex-1 inline-flex items-center justify-center gap-3 border border-border text-foreground font-display font-semibold uppercase tracking-wider text-sm px-8 py-4 hover:border-primary hover:text-primary transition-colors duration-300"
+                  >
+                    Download Catalogue
+                    <ArrowUpRight className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <Link
+                    to="/downloads"
+                    className="group flex-1 inline-flex items-center justify-center gap-3 border border-border text-foreground font-display font-semibold uppercase tracking-wider text-sm px-8 py-4 hover:border-primary hover:text-primary transition-colors duration-300"
+                  >
+                    Download Catalogue
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             </div>
           </div>

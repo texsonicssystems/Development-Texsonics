@@ -13,8 +13,8 @@ const quickLinks = [
 ];
 
 const products = [
-  { name: "AIR Series Industrial Robots", href: "/robots" },
-  { name: "CS Series Collaborative Robots", href: "/robots/cs-05-cobot" },
+  { name: "TS Series Industrial Robots", href: "/robots" },
+  { name: "TSCR Series Collaborative Robots", href: "/robots/tscr-05e" },
   { name: "AMR Mobile Robots", href: "/robots/amr-300" },
   { name: "Robot Controllers & Software", href: "/technology" },
   { name: "Automation Solutions", href: "/solutions" },

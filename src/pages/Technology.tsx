@@ -129,13 +129,13 @@ const Technology = () => {
             <div className="relative h-64 md:h-80 overflow-hidden">
               <img
                 src={air4Img}
-                alt="Texsonics AIR4-560 compact robot arm during assembly"
+                alt="Texsonics TS4-560 compact robot arm during assembly"
                 loading="lazy"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
               <span className="absolute bottom-4 left-4 tech-label text-foreground bg-background/70 backdrop-blur px-3 py-1.5">
-                AIR4-560 — ASSEMBLY BAY
+                TS4-560 — ASSEMBLY BAY
               </span>
             </div>
           </div>

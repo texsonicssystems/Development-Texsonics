@@ -10,54 +10,56 @@
 ------------------------------------------------------------------- */
 
 @layer base {
-  /* Light theme — DEFAULT */
+  /* Light theme — DEFAULT — cool blue-tinted surfaces (retuned to sample the
+     bright cyan blue #15CEEA from the Texsonics reference brochure). */
   :root {
-    /* Cool near-white surfaces */
-    --background: 210 40% 98%;
-    --foreground: 213 45% 12%;
+    /* Soft blue-grey surfaces (tamed from previous 98% brightness) */
+    --background: 205 33% 94%;
+    --foreground: 210 55% 14%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 213 45% 12%;
+    --card: 205 30% 97%;
+    --card-foreground: 210 55% 14%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 213 45% 12%;
+    --popover: 205 30% 97%;
+    --popover-foreground: 210 55% 14%;
 
-    /* Mint-teal — darker on light so text/links stay readable */
-    --primary: 168 72% 32%;
+    /* Brand cyan-blue — #15CEEA family, darkened for AA text contrast on card */
+    --primary: 190 82% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 30% 94%;
-    --secondary-foreground: 213 45% 12%;
+    --secondary: 205 30% 89%;
+    --secondary-foreground: 210 55% 14%;
 
-    --muted: 210 30% 94%;
-    --muted-foreground: 213 15% 40%;
+    --muted: 205 30% 90%;
+    --muted-foreground: 210 22% 38%;
 
-    --accent: 168 60% 92%;
-    --accent-foreground: 168 72% 25%;
+    /* Pale cyan chip surface with deep blue text */
+    --accent: 190 80% 90%;
+    --accent-foreground: 205 90% 22%;
 
     --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 213 20% 88%;
-    --input: 213 20% 88%;
-    --ring: 168 72% 32%;
+    --border: 205 25% 82%;
+    --input: 205 25% 82%;
+    --ring: 190 82% 40%;
 
     --radius: 0.375rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 213 45% 12%;
-    --sidebar-primary: 168 72% 32%;
+    --sidebar-background: 205 30% 97%;
+    --sidebar-foreground: 210 55% 14%;
+    --sidebar-primary: 190 82% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 168 60% 92%;
-    --sidebar-accent-foreground: 168 72% 25%;
-    --sidebar-border: 213 20% 88%;
-    --sidebar-ring: 168 72% 32%;
+    --sidebar-accent: 190 80% 90%;
+    --sidebar-accent-foreground: 205 90% 22%;
+    --sidebar-border: 205 25% 82%;
+    --sidebar-ring: 190 82% 40%;
 
-    --chart-1: 168 72% 32%;
-    --chart-2: 199 100% 45%;
-    --chart-3: 203 98% 22%;
-    --chart-4: 213 15% 40%;
-    --chart-5: 213 25% 65%;
+    --chart-1: 190 82% 40%;
+    --chart-2: 205 90% 32%;
+    --chart-3: 213 60% 18%;
+    --chart-4: 210 22% 38%;
+    --chart-5: 205 30% 60%;
 
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
     --font-display: 'Space Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif;

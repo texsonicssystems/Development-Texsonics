@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, FileText, CheckCircle } from "lucide-react";
+import { Download, FileText, CheckCircle, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
+import { robots } from "@/data/robots";
 
 interface DownloadFormData {
   name: string;
@@ -138,8 +139,8 @@ const Downloads = () => {
               <div className="flex items-center justify-center gap-4 mb-6">
                 <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">PDF Format</span>
               </div>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="w-full group/btn"
                 onClick={() => setIsDialogOpen(true)}
               >
@@ -148,6 +149,49 @@ const Downloads = () => {
               </Button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Robot Catalogues */}
+      <section className="pb-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="tech-label inline-block text-primary mb-4">Product Catalogues</span>
+            <h2 className="font-display font-bold uppercase tracking-tight text-3xl md:text-4xl text-foreground mb-4">
+              Robot Catalogues
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg">
+              Individual product PDF for every robot in the Texsonics lineup — full specifications, working range, and application highlights.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+            {robots.filter((r) => r.catalogue).map((robot) => (
+              <a
+                key={robot.id}
+                href={robot.catalogue}
+                download={`Texsonics-${robot.model}.pdf`}
+                className="group flex items-center gap-4 bg-card border border-border/60 rounded-lg p-4 hover:border-primary hover:shadow-md transition-all duration-300"
+              >
+                <div className="w-14 h-14 shrink-0 rounded-md bg-accent/60 flex items-center justify-center group-hover:bg-accent transition-colors">
+                  <FileText className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-display font-bold uppercase text-sm text-foreground group-hover:text-primary transition-colors">
+                    {robot.model}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {robot.series} · {robot.payload} · {robot.reach}
+                  </div>
+                </div>
+                <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+              </a>
+            ))}
+          </div>
+
+          <p className="tech-label text-muted-foreground/60 mt-8 text-center">
+            Specifications are indicative — request a datasheet for guaranteed values.
+          </p>
         </div>
       </section>
 
