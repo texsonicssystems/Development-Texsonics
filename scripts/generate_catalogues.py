@@ -458,22 +458,23 @@ def draw_chip_cloud(c, items, x, y_top, w, chip_h=8 * mm, gap=3 * mm,
         cur_x += cw + gap
     return y - chip_h - 2 * mm
 
-def draw_big_footer_callout(c, robot):
-    """Cyan-tinted panel at the bottom of the last page with model name +
-    brand + tagline."""
-    panel_h = 62 * mm
-    y_top = MARGIN_Y_BOT + 8 * mm + panel_h
+CALLOUT_H = 52 * mm
+
+def draw_big_footer_callout(c, robot, y_top):
+    """Cyan-tinted panel with model name + brand + tagline. y_top is the
+    top-y of the panel; panel occupies [y_top-CALLOUT_H, y_top]."""
+    panel_h = CALLOUT_H
     c.setFillColor(CYAN)
-    c.rect(0, MARGIN_Y_BOT + 8 * mm, PAGE_W, panel_h, fill=1, stroke=0)
+    c.rect(0, y_top - panel_h, PAGE_W, panel_h, fill=1, stroke=0)
 
     c.setFillColor(INK)
     c.setFont(SANS_BOLD, 26)
-    c.drawString(MARGIN_X, y_top - 14 * mm, robot["model"])
+    c.drawString(MARGIN_X, y_top - 12 * mm, robot["model"])
 
     c.setFont(MONO, 8)
     c.setFillColor(INK)
-    c.drawString(MARGIN_X, y_top - 22 * mm, "Texsonics Systems India Private Limited")
-    c.drawString(MARGIN_X, y_top - 26 * mm,
+    c.drawString(MARGIN_X, y_top - 20 * mm, "Texsonics Systems India Private Limited")
+    c.drawString(MARGIN_X, y_top - 24 * mm,
                  "1/6-1, Keerakaran Thottam, Keeranatham, Coimbatore 641035 · Ph: +91 94426 24304")
 
     # tagline / category line
@@ -481,13 +482,13 @@ def draw_big_footer_callout(c, robot):
     c.setFillColor(INK)
     cat = robot["series"].upper()
     axes = robot["axes"].upper()
-    c.drawString(MARGIN_X, y_top - 36 * mm, cat)
+    c.drawString(MARGIN_X, y_top - 34 * mm, cat)
     c.setFont(MONO, 8)
-    c.drawString(MARGIN_X, y_top - 40 * mm,
+    c.drawString(MARGIN_X, y_top - 38 * mm,
                  f"{axes} · PAYLOAD {robot['payload']} · REACH {robot['reach']}")
 
     c.setFont(MONO, 7.5)
-    c.drawRightString(PAGE_W - MARGIN_X, y_top - 40 * mm,
+    c.drawRightString(PAGE_W - MARGIN_X, y_top - 38 * mm,
                       "dharmar@texsonics.net  ·  www.texsonics.net")
 
 # --- Content generators (robot-specific) ---------------------------------
@@ -593,212 +594,376 @@ def build_statement(robot):
         ],
     )
 
-# --- Page builders -------------------------------------------------------
-def build_page1(c, robot, rev_label):
-    draw_backdrop(c)
-    top_y = draw_page_header(c, robot, rev_label)
+# --- Flow driver (y-cursor + page-break) --------------------------------
+class Flow:
+    """A running y cursor that owns page breaks. Sections write at self.y,
+    then advance the cursor. If a needed height wouldn't fit above the
+    footer, the flow starts a new page."""
 
-    y = draw_top_hero(c, robot, top_y)
-    features = build_feature_strip(robot)
-    y = draw_feature_strip(c, features, y)
+    FOOTER_RESERVE = MARGIN_Y_BOT + 10 * mm  # keep clear above page footer
 
-    y = draw_section_head(c, 1, "Specifications", MARGIN_X, y - 4 * mm)
-    y -= 2 * mm
+    def __init__(self, c, robot, rev_label, total_pages):
+        self.c = c
+        self.robot = robot
+        self.rev_label = rev_label
+        self.page = 1
+        self.total = total_pages
+        self.y = 0
+        self._start_page()
 
-    # Split specs into physical vs environment/mounting halves
-    specs = robot.get("specs", [])
-    # naive split: half/half
+    def _start_page(self):
+        draw_backdrop(self.c)
+        self.y = draw_page_header(self.c, self.robot, self.rev_label)
+
+    def _end_page(self, with_page_footer=True):
+        if with_page_footer:
+            draw_page_footer(self.c, self.robot, self.page, self.total)
+
+    def new_page(self):
+        self._end_page()
+        self.c.showPage()
+        self.page += 1
+        self._start_page()
+
+    def ensure(self, needed_h):
+        """Break to a new page if `needed_h` wouldn't fit above the footer."""
+        if self.y - needed_h < self.FOOTER_RESERVE:
+            self.new_page()
+
+    def close(self, with_page_footer=True):
+        self._end_page(with_page_footer=with_page_footer)
+
+# --- Section drawers (all take flow, return nothing — advance flow.y) ---
+def sec_hero(flow):
+    flow.y = draw_top_hero(flow.c, flow.robot, flow.y)
+
+def sec_feature_strip(flow):
+    features = build_feature_strip(flow.robot)
+    flow.y = draw_feature_strip(flow.c, features, flow.y)
+
+def sec_specifications(flow, num=1):
+    flow.ensure(60 * mm)
+    flow.y = draw_section_head(flow.c, num, "Specifications", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 2 * mm
+    specs = flow.robot.get("specs", [])
     half = (len(specs) + 1) // 2
-    left = specs[:half]
-    right = specs[half:]
-    left_rows  = [(r["label"], r["value"]) for r in left]
-    right_rows = [(r["label"], r["value"]) for r in right]
-
+    left = specs[:half]; right = specs[half:]
     col_w = (CONTENT_W - 12 * mm) / 2
-    y_l = draw_spec_column(c, "Mechanical", left_rows, MARGIN_X, y, col_w)
-    if right_rows:
-        y_r = draw_spec_column(c, "Environment / Control",
-                               right_rows, MARGIN_X + col_w + 12 * mm, y, col_w)
+    y_l = draw_spec_column(flow.c, "Mechanical",
+                           [(r["label"], r["value"]) for r in left],
+                           MARGIN_X, flow.y, col_w)
+    y_r = flow.y
+    if right:
+        y_r = draw_spec_column(flow.c, "Environment / Control",
+                               [(r["label"], r["value"]) for r in right],
+                               MARGIN_X + col_w + 12 * mm, flow.y, col_w)
+    flow.y = min(y_l, y_r) - 8 * mm
 
-    draw_page_footer(c, robot, 1, 4)
+def sec_overview(flow, num=2):
+    flow.ensure(90 * mm)
+    flow.y = draw_section_head(flow.c, num, "Overview", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 4 * mm
+    statement, desc, items = build_statement(flow.robot)
+    flow.y = draw_statement_and_features(flow.c, statement, desc, items,
+                                         flow.y)
+    flow.y -= 8 * mm
 
-def build_page2(c, robot, rev_label):
-    draw_backdrop(c)
-    top_y = draw_page_header(c, robot, rev_label)
+def sec_product_photo(flow, num=3, target_h=None):
+    """Product photo sized to fill remaining space on the current page.
+    If less than the minimum photo height (70mm) remains, page-breaks first
+    and then sizes to fill the new page."""
+    HEAD = 8 * mm
+    CAPTION = 6 * mm
+    MIN_H = 70 * mm
+    MAX_H = 140 * mm
+    reserve = HEAD + CAPTION + 4 * mm  # gap between sections
 
-    y = draw_section_head(c, 2, "Overview", MARGIN_X, top_y - 6 * mm)
-    statement, desc, items = build_statement(robot)
-    y = draw_statement_and_features(c, statement, desc, items, y - 4 * mm)
+    if target_h is None:
+        avail = flow.y - flow.FOOTER_RESERVE - reserve
+        if avail < MIN_H:
+            flow.new_page()
+            avail = flow.y - flow.FOOTER_RESERVE - reserve
+        target_h = min(avail, MAX_H)
 
-    y -= 6 * mm
-    y = draw_section_head(c, 3, "Product", MARGIN_X, y - 4 * mm)
-    y -= 4 * mm
+    flow.y = draw_section_head(flow.c, num, "Product", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 4 * mm
+    img = IMAGE_BY_ID.get(flow.robot["id"])
+    photo_top = flow.y
+    draw_product_photo(flow.c, img, MARGIN_X, photo_top, CONTENT_W, target_h)
+    flow.c.setFillColor(MUTED)
+    flow.c.setFont(MONO, 7.6)
+    flow.c.drawString(MARGIN_X, photo_top - target_h - 4 * mm,
+                      f"{flow.robot['model'].upper()} · {flow.robot['series'].upper()}")
+    flow.y = photo_top - target_h - 10 * mm
 
-    # Product photo — big card
-    img = IMAGE_BY_ID.get(robot["id"])
-    photo_h = min(y - MARGIN_Y_BOT - 20 * mm, 105 * mm)
-    photo_h = max(photo_h, 80 * mm)
-    photo_w = CONTENT_W
-    photo_top = y
-    draw_product_photo(c, img, MARGIN_X, photo_top, photo_w, photo_h)
+def sec_working_range(flow, num=4):
+    wr = flow.robot.get("workingRange", [])
+    if not wr:
+        return
+    flow.ensure(55 * mm)
+    flow.y = draw_section_head(flow.c, num, "Working Range", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 2 * mm
+    half = (len(wr) + 1) // 2
+    col_w = (CONTENT_W - 12 * mm) / 2
+    y_l = draw_spec_column(flow.c, "Motion — Group A",
+                           [(r["label"], r["value"]) for r in wr[:half]],
+                           MARGIN_X, flow.y, col_w)
+    y_r = flow.y
+    if wr[half:]:
+        y_r = draw_spec_column(flow.c, "Motion — Group B",
+                               [(r["label"], r["value"]) for r in wr[half:]],
+                               MARGIN_X + col_w + 12 * mm, flow.y, col_w)
+    flow.y = min(y_l, y_r) - 8 * mm
 
-    # caption underneath
-    c.setFillColor(MUTED)
-    c.setFont(MONO, 7.6)
-    c.drawString(MARGIN_X, photo_top - photo_h - 4 * mm,
-                 f"{robot['model'].upper()} · {robot['series'].upper()}")
-
-    draw_page_footer(c, robot, 2, 4)
-
-def build_page3(c, robot, rev_label):
-    draw_backdrop(c)
-    top_y = draw_page_header(c, robot, rev_label)
-
-    y = draw_section_head(c, 4, "Working Range", MARGIN_X, top_y - 6 * mm)
-    y -= 2 * mm
-
-    wr = robot.get("workingRange", [])
-    if wr:
-        half = (len(wr) + 1) // 2
-        col_w = (CONTENT_W - 12 * mm) / 2
-        y_l = draw_spec_column(c, "Motion — Group A",
-                               [(r["label"], r["value"]) for r in wr[:half]],
-                               MARGIN_X, y, col_w)
-        if wr[half:]:
-            y_r = draw_spec_column(c, "Motion — Group B",
-                                   [(r["label"], r["value"]) for r in wr[half:]],
-                                   MARGIN_X + col_w + 12 * mm, y, col_w)
-        y = min(y_l, y_r) if wr[half:] else y_l
-
-    y -= 8 * mm
-    y = draw_section_head(c, 5, "Control & Integration", MARGIN_X, y - 4 * mm)
-    y -= 4 * mm
-
-    # 4-column integration grid
+def sec_control_integration(flow, num=5):
+    flow.ensure(52 * mm)
+    flow.y = draw_section_head(flow.c, num, "Control & Integration",
+                               MARGIN_X, flow.y - 2 * mm)
+    flow.y -= 4 * mm
     integ = [
-        ("CONTROLLER",
-         "Texsonics RC series",
+        ("CONTROLLER", "Texsonics RC series",
          "in-house motion controller, dual-kernel real-time OS"),
-        ("TEACH PENDANT",
-         "11.5″ touch tablet",
+        ("TEACH PENDANT", "11.5″ touch tablet",
          "drag-teaching, Wi-Fi, on-device offline programming"),
-        ("FIELDBUS",
-         "EtherCAT / Modbus TCP",
+        ("FIELDBUS", "EtherCAT / Modbus TCP",
          "industrial fieldbus, dual-protocol support"),
-        ("SOFTWARE",
-         "TEXCAM offline CAM",
+        ("SOFTWARE", "TEXCAM offline CAM",
          "toolpath generation, digital twin simulation, vision"),
     ]
     col_w = (CONTENT_W - 3 * 6 * mm) / 4
+    y_top = flow.y
+    block_h = 34 * mm
     for i, (label, headline, body) in enumerate(integ):
         x = MARGIN_X + i * (col_w + 6 * mm)
-        c.setFillColor(CYAN_INK)
-        c.setFont(MONO_BOLD, 7.5)
-        c.drawString(x, y, label)
-        c.setFillColor(INK)
-        c.setFont(SANS_BOLD, 10.5)
-        # wrap headline
-        hl_lines = wrap(headline, col_w, SANS_BOLD, 10.5, c)
-        yy = y - 5 * mm
+        flow.c.setFillColor(CYAN_INK)
+        flow.c.setFont(MONO_BOLD, 7.5)
+        flow.c.drawString(x, y_top, label)
+        flow.c.setFillColor(INK)
+        flow.c.setFont(SANS_BOLD, 10.5)
+        hl_lines = wrap(headline, col_w, SANS_BOLD, 10.5, flow.c)
+        yy = y_top - 5 * mm
         for line in hl_lines:
-            c.drawString(x, yy, line)
-            yy -= 12
-        c.setFillColor(MUTED)
-        c.setFont(SANS, 8.6)
-        body_lines = wrap(body, col_w, SANS, 8.6, c)
-        for line in body_lines:
-            c.drawString(x, yy, line)
-            yy -= 11
-        # dashed vertical divider
+            flow.c.drawString(x, yy, line); yy -= 12
+        flow.c.setFillColor(MUTED)
+        flow.c.setFont(SANS, 8.6)
+        for line in wrap(body, col_w, SANS, 8.6, flow.c):
+            flow.c.drawString(x, yy, line); yy -= 11
         if i < 3:
-            c.setStrokeColor(HAIRLINE)
-            c.setLineWidth(0.5)
-            c.setDash(2, 3)
-            c.line(x + col_w + 3 * mm, y + 2 * mm,
-                   x + col_w + 3 * mm, y - 32 * mm)
-            c.setDash()
+            flow.c.setStrokeColor(HAIRLINE)
+            flow.c.setLineWidth(0.5)
+            flow.c.setDash(2, 3)
+            flow.c.line(x + col_w + 3 * mm, y_top + 2 * mm,
+                        x + col_w + 3 * mm, y_top - block_h + 4 * mm)
+            flow.c.setDash()
+    flow.y = y_top - block_h - 4 * mm
 
-    draw_page_footer(c, robot, 3, 4)
-
-def build_page4(c, robot, rev_label):
-    draw_backdrop(c)
-    top_y = draw_page_header(c, robot, rev_label)
-
-    y = draw_section_head(c, 6, "Applications", MARGIN_X, top_y - 6 * mm)
-    y -= 2 * mm
-
-    # 1-line intro
-    is_amr = robot["series"].startswith("AMR")
+def sec_applications(flow, num=6):
+    flow.ensure(50 * mm)
+    flow.y = draw_section_head(flow.c, num, "Applications", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 2 * mm
+    is_amr = flow.robot["series"].startswith("AMR")
     intro = (
         "Autonomous material movement across production, warehousing and "
         "finished-goods flows — dispatched from the Texsonics fleet manager."
         if is_amr else
-        f"Deployable across the primary applications the {robot['model']} was "
-        "engineered for — full production-line integration with the Texsonics "
-        "control stack."
+        f"Deployable across the primary applications the "
+        f"{flow.robot['model']} was engineered for — full production-line "
+        "integration with the Texsonics control stack."
     )
-    y = draw_wrapped(c, intro, MARGIN_X, y - 2 * mm,
-                     CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
-    y -= 4 * mm
-
-    apps = robot.get("applications", []) + [
+    flow.y = draw_wrapped(flow.c, intro, MARGIN_X, flow.y - 2 * mm,
+                          CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
+    flow.y -= 4 * mm
+    apps = flow.robot.get("applications", []) + [
         "Machine Tending", "CNC Loading", "Palletizing", "Assembly",
         "Packaging", "Vision Inspection",
     ]
-    # dedupe preserving order
     seen = set(); dedup = []
     for a in apps:
-        if a not in seen:
-            seen.add(a); dedup.append(a)
+        if a not in seen: seen.add(a); dedup.append(a)
+    flow.y = draw_chip_cloud(flow.c, dedup[:12], MARGIN_X, flow.y, CONTENT_W)
+    flow.y -= 6 * mm
 
-    y = draw_chip_cloud(c, dedup[:12], MARGIN_X, y, CONTENT_W)
-
-    y -= 6 * mm
-    y = draw_section_head(c, 7, "Built for the Operator", MARGIN_X, y - 4 * mm)
-    y -= 4 * mm
-
+def sec_operator_features(flow, num=7):
     ops = [
-        "Live 3D position display",
-        "Online command execution",
-        "Position editor",
-        "Variable monitor",
-        "I/O monitor",
-        "Error diagnostics",
-        "Dynamic teach-in",
-        "Digital twin simulation",
+        "Live 3D position display", "Online command execution",
+        "Position editor", "Variable monitor",
+        "I/O monitor", "Error diagnostics",
+        "Dynamic teach-in", "Digital twin simulation",
     ]
-    # 2-column bulleted list
+    flow.ensure(50 * mm)
+    flow.y = draw_section_head(flow.c, num, "Built for the Operator",
+                               MARGIN_X, flow.y - 2 * mm)
+    flow.y -= 4 * mm
     col_w = (CONTENT_W - 12 * mm) / 2
     rows_per_col = (len(ops) + 1) // 2
+    y_top = flow.y
     for i, item in enumerate(ops):
         col = 0 if i < rows_per_col else 1
         row = i if col == 0 else i - rows_per_col
         x = MARGIN_X + col * (col_w + 12 * mm)
-        yy = y - row * 8 * mm
-        c.setFillColor(CYAN)
-        c.rect(x, yy - 0.5 * mm, 2.6 * mm, 2.6 * mm, fill=1, stroke=0)
-        c.setFillColor(INK)
-        c.setFont(SANS, 9.6)
-        c.drawString(x + 5 * mm, yy, item)
-        if i < len(ops) - 1 and row < rows_per_col - 1:
-            draw_hairline(c, x, yy - 4 * mm, col_w)
+        yy = y_top - row * 8 * mm
+        flow.c.setFillColor(CYAN)
+        flow.c.rect(x, yy - 0.5 * mm, 2.6 * mm, 2.6 * mm, fill=1, stroke=0)
+        flow.c.setFillColor(INK)
+        flow.c.setFont(SANS, 9.6)
+        flow.c.drawString(x + 5 * mm, yy, item)
+        if row < rows_per_col - 1:
+            draw_hairline(flow.c, x, yy - 4 * mm, col_w)
+    flow.y = y_top - rows_per_col * 8 * mm - 4 * mm
 
-    # Disclaimer strip above footer callout
-    y_disc = MARGIN_Y_BOT + 8 * mm + 62 * mm + 8 * mm
-    c.setFillColor(MUTED)
-    c.setFont(MONO, 6.8)
+def sec_ready_to_integrate(flow, num=9):
+    """Full-width cyan-tinted hero panel with a big statement and CTA line —
+    fills the mid-lower area of the last page so the layout stays continuous
+    down to the branded callout footer."""
+    panel_h = 55 * mm
+    flow.ensure(panel_h + 12 * mm)
+    flow.y = draw_section_head(flow.c, num, "Ready to Integrate",
+                               MARGIN_X, flow.y - 2 * mm)
+    flow.y -= 4 * mm
+
+    y_top = flow.y
+    # Soft cyan tint panel
+    flow.c.setFillColor(HexColor("#E7FAFE"))
+    flow.c.rect(MARGIN_X, y_top - panel_h, CONTENT_W, panel_h,
+                fill=1, stroke=0)
+    # Left cyan accent bar
+    flow.c.setFillColor(CYAN)
+    flow.c.rect(MARGIN_X, y_top - panel_h, 3 * mm, panel_h, fill=1, stroke=0)
+
+    # Big statement, left side
+    stmt = (f"Talk to an engineer about integrating the "
+            f"{flow.robot['model']} into your line.")
+    flow.c.setFillColor(INK)
+    flow.c.setFont(SANS_BOLD, 18)
+    stmt_x = MARGIN_X + 10 * mm
+    stmt_w = CONTENT_W * 0.55 - 10 * mm
+    yy = y_top - 12 * mm
+    for line in wrap(stmt, stmt_w, SANS_BOLD, 18, flow.c):
+        flow.c.drawString(stmt_x, yy, line); yy -= 21
+    # sub-body
+    flow.c.setFillColor(MUTED)
+    flow.c.setFont(SANS, 9.5)
+    sub = ("Applications engineering, cycle-time sizing, and turnkey cell "
+           "design are included on every project.")
+    yy -= 2 * mm
+    for line in wrap(sub, stmt_w, SANS, 9.5, flow.c):
+        flow.c.drawString(stmt_x, yy, line); yy -= 12.5
+
+    # Right column — contact block, mono style
+    rx = MARGIN_X + CONTENT_W * 0.60
+    rw = CONTENT_W - (CONTENT_W * 0.60) - 6 * mm
+    ry = y_top - 12 * mm
+    flow.c.setFillColor(CYAN_INK)
+    flow.c.setFont(MONO_BOLD, 7.5)
+    flow.c.drawString(rx, ry, "CONTACT")
+    ry -= 5.5 * mm
+    flow.c.setFillColor(INK)
+    flow.c.setFont(SANS_BOLD, 11)
+    flow.c.drawString(rx, ry, "Dharmar Krishnan")
+    ry -= 5 * mm
+    flow.c.setFillColor(INK)
+    flow.c.setFont(MONO, 9)
+    flow.c.drawString(rx, ry, "Managing Director"); ry -= 5 * mm
+    flow.c.drawString(rx, ry, "+91 94426 24304"); ry -= 4 * mm
+    flow.c.drawString(rx, ry, "dharmar@texsonics.net"); ry -= 4 * mm
+    flow.c.drawString(rx, ry, "www.texsonics.net")
+
+    flow.y = y_top - panel_h - 6 * mm
+
+def sec_service_and_support(flow, num=8):
+    """Filler section — MADE IN INDIA panel with support/warranty content.
+    Adds density to the last page so the cyan callout footer sits at the
+    bottom naturally rather than leaving a big empty gap."""
+    panel_h = 46 * mm
+    flow.ensure(panel_h + 14 * mm)
+    flow.y = draw_section_head(flow.c, num, "Service & Support",
+                               MARGIN_X, flow.y - 2 * mm)
+    flow.y -= 4 * mm
+
+    # Two-column panel: left = big statement, right = bullet list
+    y_top = flow.y
+    left_w = CONTENT_W * 0.44
+    right_x = MARGIN_X + left_w + 8 * mm
+    right_w = CONTENT_W - left_w - 8 * mm
+
+    flow.c.setFillColor(INK)
+    flow.c.setFont(SANS_BOLD, 16)
+    for line in wrap("Made in Coimbatore. Supported from Coimbatore.",
+                     left_w, SANS_BOLD, 16, flow.c):
+        flow.c.drawString(MARGIN_X, y_top, line)
+        y_top -= 20
+    y_top -= 2 * mm
+    flow.c.setFillColor(MUTED)
+    flow.c.setFont(SANS, 9)
+    para = (f"Every {flow.robot['model']} is engineered, built and calibrated "
+            "in our Coimbatore facility. Field service, spares and applications "
+            "engineering ship from the same address — no import lead times, "
+            "no time-zone escalations.")
+    for line in wrap(para, left_w, SANS, 9, flow.c):
+        flow.c.drawString(MARGIN_X, y_top, line)
+        y_top -= 12
+
+    # Right column — support pillars
+    y_right = flow.y
+    pillars = [
+        ("STANDARD WARRANTY",
+         "12 months on the mechanical assembly, 12 months on the controller."),
+        ("APPLICATIONS ENGINEERING",
+         "Cell design, cycle-time studies and end-of-arm tooling by our "
+         "in-house team, included on every project."),
+        ("SPARES & FIELD SERVICE",
+         "Direct-to-plant spares from Coimbatore, with pan-India field service "
+         "engineers on 24-hour dispatch."),
+    ]
+    for label, body in pillars:
+        flow.c.setFillColor(CYAN_INK)
+        flow.c.setFont(MONO_BOLD, 7.5)
+        flow.c.drawString(right_x, y_right, label)
+        y_right -= 4.5 * mm
+        flow.c.setFillColor(GREY_DARK if False else INK)
+        flow.c.setFont(SANS, 8.8)
+        body_lines = wrap(body, right_w, SANS, 8.8, flow.c)
+        for line in body_lines:
+            flow.c.drawString(right_x, y_right, line); y_right -= 11
+        y_right -= 1.5 * mm
+
+    flow.y = min(y_top, y_right) - 4 * mm
+
+def sec_disclaimer_and_callout(flow):
+    """Disclaimer sits inline; the big cyan model callout is pinned to the
+    page bottom as a hero back-cover strip. If content already extended
+    close to the bottom, we still land the callout flush against
+    MARGIN_Y_BOT."""
     disc = ("SPECIFICATIONS AND VISUALS MAY CHANGE WITHOUT NOTICE AS PART OF "
             "ONGOING PRODUCT IMPROVEMENTS. IMAGES ARE FOR REFERENCE ONLY. "
-            "UNAUTHORIZED REPRODUCTION OF THIS CATALOGUE IS PROHIBITED WITHOUT "
-            "WRITTEN PERMISSION FROM TEXSONICS SYSTEMS INDIA PRIVATE LIMITED.")
-    disc_lines = wrap(disc, CONTENT_W, MONO, 6.8, c)
-    yy = y_disc
-    for line in disc_lines:
-        c.drawString(MARGIN_X, yy, line)
-        yy -= 9
+            "UNAUTHORIZED REPRODUCTION OF THIS CATALOGUE IS PROHIBITED "
+            "WITHOUT WRITTEN PERMISSION FROM TEXSONICS SYSTEMS INDIA PRIVATE "
+            "LIMITED.")
+    flow.c.setFont(MONO, 6.8)
+    disc_lines = wrap(disc, CONTENT_W, MONO, 6.8, flow.c)
+    line_leading = 9  # pt
+    disc_block_h = len(disc_lines) * line_leading + 2 * mm
 
-    draw_big_footer_callout(c, robot)
-    # No page-num footer on last page — the callout is the footer
+    # Callout is anchored to page bottom (no page footer under it — it IS
+    # the footer). Reserve space and page-break if there's not room.
+    callout_top_from_bottom = MARGIN_Y_BOT + 4 * mm + CALLOUT_H
+    disc_top_needed = callout_top_from_bottom + 4 * mm + disc_block_h
+    if flow.y < disc_top_needed + 4 * mm:
+        flow.new_page()
+
+    # Draw disclaimer just above the callout
+    flow.c.setFillColor(MUTED)
+    flow.c.setFont(MONO, 6.8)
+    yy = callout_top_from_bottom + 4 * mm + disc_block_h - 4
+    for line in disc_lines:
+        flow.c.drawString(MARGIN_X, yy, line); yy -= line_leading
+
+    draw_big_footer_callout(flow.c, flow.robot, callout_top_from_bottom)
 
 # --- Main ----------------------------------------------------------------
 def generate(robot):
@@ -810,13 +975,39 @@ def generate(robot):
 
     rev_label = f"DATASHEET · REV. {date.today().strftime('%Y-%m')}"
 
-    build_page1(c, robot, rev_label); c.showPage()
-    build_page2(c, robot, rev_label); c.showPage()
-    build_page3(c, robot, rev_label); c.showPage()
-    build_page4(c, robot, rev_label); c.showPage()
+    # Two-pass to know total_pages first. Pass 1: dry-run measuring; we don't
+    # actually have a canvas to measure into cheaply, so instead do a real
+    # first pass writing to /dev/null-like output, then re-run for total.
+    import io
+    dummy = canvas.Canvas(io.BytesIO(), pagesize=A4)
+    d_flow = Flow(dummy, robot, rev_label, total_pages=99)
+    _fill_flow(d_flow)
+    d_flow.close()
+    total = d_flow.page
 
+    # Pass 2: real output with correct footer page-numbers
+    flow = Flow(c, robot, rev_label, total_pages=total)
+    _fill_flow(flow)
+    flow.close()
     c.save()
-    print(f"[OK] {out}")
+    print(f"[OK] {out}  ({total} pages)")
+
+def _fill_flow(flow):
+    """Emit all sections into `flow` in reading order. Sections manage their
+    own page-break checks via flow.ensure()."""
+    # Section head numbers are contiguous (01..08)
+    sec_hero(flow)
+    sec_feature_strip(flow)
+    sec_specifications(flow, num=1)
+    sec_product_photo(flow, num=2)   # fills page-1 whitespace after specs
+    sec_working_range(flow, num=3)
+    sec_overview(flow, num=4)
+    sec_control_integration(flow, num=5)
+    sec_applications(flow, num=6)
+    sec_operator_features(flow, num=7)
+    sec_service_and_support(flow, num=8)
+    sec_ready_to_integrate(flow, num=9)
+    sec_disclaimer_and_callout(flow)
 
 def main():
     robots = parse_robots()
