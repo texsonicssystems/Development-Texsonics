@@ -193,16 +193,10 @@ def draw_wrapped(c, text, x, y_top, max_w, font, size, color, leading=None):
 
 # --- Page chrome ---------------------------------------------------------
 def draw_backdrop(c):
-    """Very faint blueprint grid across the whole page."""
-    c.setStrokeColor(HAIRLINE_SOFT)
-    c.setLineWidth(0.25)
-    step = 14 * mm
-    x = 0.0
-    while x < PAGE_W:
-        c.line(x, 0, x, PAGE_H); x += step
-    y = 0.0
-    while y < PAGE_H:
-        c.line(0, y, PAGE_W, y); y += step
+    """Plain white page background (no blueprint grid — flat white per
+    design request)."""
+    c.setFillColor(WHITE)
+    c.rect(0, 0, PAGE_W, PAGE_H, fill=1, stroke=0)
 
 def draw_page_header(c, robot, rev_label):
     y = PAGE_H - MARGIN_Y_TOP
@@ -428,33 +422,36 @@ def draw_product_photo(c, img_path, x, y_top, w, h):
 
 def draw_chip_cloud(c, items, x, y_top, w, chip_h=8 * mm, gap=3 * mm,
                     highlight_first=True):
-    """Applications rendered as outlined pill/rectangle chips."""
+    """Applications rendered as outlined pill/rectangle chips. Each chip is
+    measured with the SAME font it is drawn in, so text never overruns the
+    chip's border (the highlighted chip uses mono, the rest use sans —
+    mono glyphs are wider, so measuring with the wrong font under-sizes
+    the chip)."""
     cur_x = x
     y = y_top
-    c.setFont(SANS, 9)
+    pad_x = 4 * mm
     for i, txt in enumerate(items):
-        tw = c.stringWidth(txt, SANS, 9)
-        cw = tw + 8 * mm
+        highlight = (i == 0 and highlight_first)
+        font = MONO if highlight else SANS
+        tw = c.stringWidth(txt, font, 9)
+        cw = tw + 2 * pad_x
         if cur_x + cw > x + w:
             cur_x = x
             y -= chip_h + gap
-        highlight = (i == 0 and highlight_first)
         if highlight:
             c.setStrokeColor(CYAN)
             c.setFillColor(WHITE)
             c.setLineWidth(1.2)
             c.rect(cur_x, y - chip_h, cw, chip_h, fill=1, stroke=1)
             c.setFillColor(CYAN_INK)
-            c.setFont(MONO, 9)
-            c.drawString(cur_x + 4 * mm, y - chip_h + 2.6 * mm, txt)
         else:
             c.setStrokeColor(HAIRLINE)
             c.setFillColor(WHITE)
             c.setLineWidth(0.7)
             c.rect(cur_x, y - chip_h, cw, chip_h, fill=1, stroke=1)
             c.setFillColor(INK)
-            c.setFont(SANS, 9)
-            c.drawString(cur_x + 4 * mm, y - chip_h + 2.6 * mm, txt)
+        c.setFont(font, 9)
+        c.drawString(cur_x + pad_x, y - chip_h + 2.6 * mm, txt)
         cur_x += cw + gap
     return y - chip_h - 2 * mm
 
@@ -864,7 +861,7 @@ def sec_ready_to_integrate(flow, num=9):
     ry -= 5.5 * mm
     flow.c.setFillColor(INK)
     flow.c.setFont(SANS_BOLD, 11)
-    flow.c.drawString(rx, ry, "Dharmar Krishnan")
+    flow.c.drawString(rx, ry, "Dharmar R")
     ry -= 5 * mm
     flow.c.setFillColor(INK)
     flow.c.setFont(MONO, 9)

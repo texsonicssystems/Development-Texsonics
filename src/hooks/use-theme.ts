@@ -5,10 +5,10 @@ export type Theme = "light" | "dark";
 const STORAGE_KEY = "texsonics-theme";
 
 export const getInitialTheme = (): Theme => {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return "light";
+  return "dark";
 };
 
 const applyTheme = (theme: Theme) => {

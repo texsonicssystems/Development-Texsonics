@@ -55,7 +55,7 @@ const Footer = () => {
           {/* Company */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <img src={logo} alt="Texsonics" className="h-8" />
+              <img src={logo} alt="Texsonics" className="brand-logo-adaptive h-8" />
               <span className="font-display font-bold uppercase tracking-widest text-foreground">
                 Texsonics
               </span>

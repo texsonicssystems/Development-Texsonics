@@ -16,22 +16,27 @@
     <meta name="rating" content="general" />
     <meta name="distribution" content="global" />
     <meta name="revisit-after" content="7 days" />
-    <meta name="theme-color" content="#f4f8fb" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#0a0f16" />
+    <meta name="color-scheme" content="dark" />
 
-    <!-- Inline theme init: reads user preference before first paint to avoid FOUC -->
+    <!-- Inline theme init: reads user preference before first paint to avoid FOUC.
+         Default is dark; only an explicit "light" choice switches it. -->
     <script>
       (function () {
         try {
           var stored = localStorage.getItem('texsonics-theme');
-          if (stored === 'dark') {
-            document.documentElement.classList.add('dark');
+          if (stored === 'light') {
+            document.documentElement.classList.remove('dark');
             var m = document.querySelector('meta[name="theme-color"]');
-            if (m) m.content = '#0a0f16';
+            if (m) m.content = '#e7edf1';
             var s = document.querySelector('meta[name="color-scheme"]');
-            if (s) s.content = 'dark';
+            if (s) s.content = 'light';
+          } else {
+            document.documentElement.classList.add('dark');
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
       })();
     </script>
 

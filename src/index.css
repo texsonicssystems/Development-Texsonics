@@ -225,6 +225,17 @@
     text-transform: uppercase;
   }
 
+  /* Wordmark logo is a pale saffron→green gradient with no outline — on the
+     light theme's near-white surfaces it loses contrast. Add a soft contact
+     shadow to keep it legible; dark theme's navy background never needs it. */
+  .brand-logo-adaptive {
+    filter: drop-shadow(0 1px 1.5px hsl(210 55% 14% / 0.28))
+            drop-shadow(0 0 1px hsl(210 55% 14% / 0.35));
+  }
+  .dark .brand-logo-adaptive {
+    filter: none;
+  }
+
   /* Signature brand gradients (#014871→#A0EBCF / #2FBDFF→#A0EBCF) */
   .bg-gradient-brand {
     background-image: linear-gradient(135deg, #014871, #a0ebcf);

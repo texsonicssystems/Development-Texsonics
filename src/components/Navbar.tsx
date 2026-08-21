@@ -84,7 +84,7 @@ const Navbar = () => {
               <img
                 src={logo}
                 alt="Texsonics Systems India"
-                className="h-7 md:h-8 transition-transform duration-300 group-hover:scale-105"
+                className="brand-logo-adaptive h-7 md:h-8 transition-transform duration-300 group-hover:scale-105"
               />
               <span className="font-display font-bold uppercase tracking-widest text-foreground text-sm md:text-base">
                 Texsonics

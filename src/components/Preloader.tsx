@@ -81,7 +81,7 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
         {/* Top row */}
         <div className="flex items-center justify-between">
           <div className="pre-item flex items-center gap-3">
-            <img src={logo} alt="Texsonics" className="h-7 md:h-8" />
+            <img src={logo} alt="Texsonics" className="brand-logo-adaptive h-7 md:h-8" />
             <span className="font-display font-bold uppercase tracking-widest text-foreground text-sm">
               Texsonics
             </span>
