@@ -226,11 +226,16 @@
   }
 
   /* Wordmark logo is a pale saffron→green gradient with no outline — on the
-     light theme's near-white surfaces it loses contrast. Add a soft contact
-     shadow to keep it legible; dark theme's navy background never needs it. */
+     light theme's near-white surfaces it loses contrast. Stack a soft
+     drop-shadow contact + a spread outer glow made from two wider blurs
+     so the mark reads clearly on the near-white navbar. Dark theme's
+     navy background needs none of this. */
   .brand-logo-adaptive {
-    filter: drop-shadow(0 1px 1.5px hsl(210 55% 14% / 0.28))
-            drop-shadow(0 0 1px hsl(210 55% 14% / 0.35));
+    filter:
+      drop-shadow(0 1px 1.5px hsl(210 55% 14% / 0.35))
+      drop-shadow(0 0 2px hsl(210 55% 14% / 0.55))
+      drop-shadow(0 0 6px hsl(210 55% 14% / 0.35))
+      drop-shadow(0 0 14px hsl(210 55% 14% / 0.22));
   }
   .dark .brand-logo-adaptive {
     filter: none;
