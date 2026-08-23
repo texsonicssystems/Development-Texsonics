@@ -59,7 +59,7 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <SEO
         title="Industrial Robots Made in India | 4–6 Axis Arms | Texsonics"
-        description="Texsonics manufactures 4–6 axis industrial robots, cobots, and AMRs in Coimbatore, India — with our own controller and CAM software. 25+ years, local support."
+        description="Texsonics manufactures 4–6 axis industrial robots, cobots, and AMRs in Coimbatore, India — with our own controller and CAM software. 27+ years, local support."
         canonical="/"
         keywords="industrial robot manufacturer India, robot arm made in India, 6 axis robot, collaborative robot India, AMR autonomous mobile robot, machine tending robot, welding robot, palletizing robot, robot controller India, factory automation Coimbatore"
         jsonLd={homepageJsonLd}

@@ -62,7 +62,7 @@ const Footer = () => {
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-8">
               Industrial robot arms, collaborative robots, and autonomous mobile
-              robots — designed and manufactured in India since 2004.
+              robots — designed and manufactured in India since 1998.
             </p>
             <div className="flex gap-2">
               {socials.map(({ icon: Icon, href, label }) => (

@@ -6,16 +6,17 @@ import SEO from "@/components/SEO";
 import workshopImg from "@/assets/robots/workshop-air6.jpg";
 
 const milestones = [
-  { year: "2004", note: "Founded in Coimbatore as a precision engineering company." },
-  { year: "2010s", note: "Two decades of automation-grade manufacturing for OEMs and machine builders." },
-  { year: "2024", note: "In-house robot controller and motion software platform completed." },
-  { year: "Today", note: "Manufacturing 4–6 axis industrial robots, cobots, and AMRs — fully in India." },
+  { year: "1998", note: "Founded in Coimbatore as a precision sheet-metal fabrication company." },
+  { year: "2000s", note: "Two decades of sheet-metal work for OEMs, machine builders and enclosure customers." },
+  { year: "2020s", note: "Pivoted focus toward automation — cell design, controllers and integration." },
+  { year: "2024", note: "In-house RC series robot controller and TEXCAM motion software completed." },
+  { year: "Today", note: "Manufacturing 4–6 axis robots, cobots and AMRs — with our own controller and CAM." },
 ];
 
 const values = [
   { icon: Award, title: "Engineering First", description: "Every machine we ship is designed, built, and tested by our own engineers — no rebadged imports." },
   { icon: Users, title: "Customer Partnership", description: "We automate your process, not just sell you hardware. Cell scoping to operator training, one team." },
-  { icon: Target, title: "Precision Heritage", description: "25+ years of tight-tolerance manufacturing discipline now applied to robot arms and controllers." },
+  { icon: Target, title: "Precision Heritage", description: "27+ years of tight-tolerance sheet-metal and precision manufacturing discipline now applied to robot arms and controllers." },
 ];
 
 const aboutJsonLd = {
@@ -36,8 +37,8 @@ const About = () => {
   return (
     <main className="min-h-screen bg-background">
       <SEO
-        title="About Texsonics | Robot Manufacturer in India Since 2004"
-        description="Texsonics builds robot arms, cobots, and AMRs in Coimbatore, Tamil Nadu — 25+ years of precision engineering with an in-house controller and software stack."
+        title="About Texsonics | Robot Manufacturer in India Since 1998"
+        description="Texsonics builds robot arms, cobots, and AMRs in Coimbatore, Tamil Nadu — 27+ years of precision engineering with an in-house controller and software stack."
         canonical="/about"
         keywords="about Texsonics, robot manufacturer India, robotics company Coimbatore, Indian robot arm maker, industrial automation company Tamil Nadu"
         jsonLd={aboutJsonLd}
@@ -48,7 +49,7 @@ const About = () => {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="tech-label inline-block text-primary mb-4">About Us</span>
             <h1 className="font-display font-bold uppercase tracking-tight text-4xl md:text-5xl text-foreground mb-6">
-              25 Years Of Engineering.
+              27 Years Of Engineering.
               <br />
               <span className="text-primary">Now Building Robots.</span>
             </h1>
@@ -79,11 +80,11 @@ const About = () => {
             <div>
               <h2 className="font-display font-bold uppercase tracking-tight text-3xl text-foreground mb-6">Our Story</h2>
               <p className="text-muted-foreground mb-4 leading-relaxed">
-                Founded in 2004 in Coimbatore, Texsonics spent two decades
-                mastering precision manufacturing for automation, machine
-                building, and OEM customers. That discipline — tight tolerances,
-                fast turnarounds, everything under one roof — is exactly what
-                building robots demands.
+                Founded in 1998 in Coimbatore, Texsonics spent over two decades
+                as a precision sheet-metal fabrication and automation-support
+                partner for OEMs and machine builders. That discipline — tight
+                tolerances, fast turnarounds, everything under one roof — is
+                exactly what building robots demands.
               </p>
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 Today our focus is robotics: 4–6 axis industrial robot arms,
@@ -94,9 +95,9 @@ const About = () => {
               </p>
               <div className="grid grid-cols-2 gap-px bg-border border border-border">
                 {[
-                  { icon: Calendar, label: "Founded", value: "2004" },
+                  { icon: Calendar, label: "Founded", value: "1998" },
                   { icon: Building, label: "Facility", value: "25,000 sq.ft" },
-                  { icon: Users, label: "Team", value: "100+" },
+                  { icon: Users, label: "Team", value: "20+" },
                   { icon: Globe, label: "Clients", value: "150+" },
                 ].map((stat, i) => (
                   <div key={i} className="flex items-center gap-3 p-4 bg-card">

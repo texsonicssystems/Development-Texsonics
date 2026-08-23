@@ -7,8 +7,10 @@ import logo from "@/assets/texsonics-logo.png";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Robots", href: "/robots" },
+  { name: "Sheet Metal", href: "/sheet-metal" },
   { name: "Solutions", href: "/solutions" },
   { name: "Technology", href: "/technology" },
+  { name: "Gallery", href: "/gallery" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];

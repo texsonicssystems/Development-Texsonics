@@ -87,7 +87,7 @@ const Preloader = ({ onComplete }: PreloaderProps) => {
             </span>
           </div>
           <span className="pre-item tech-label text-muted-foreground hidden sm:block">
-            EST. 2004 — COIMBATORE, IN
+            EST. 1998 — COIMBATORE, IN
           </span>
         </div>
 

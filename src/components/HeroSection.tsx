@@ -94,7 +94,7 @@ const HeroSection = () => {
           ROBOT CONTROL / CAM SOFTWARE
         </div>
         <div className="absolute top-28 right-6 md:right-10 z-[3] tech-label text-muted-foreground hidden md:block hero-fade">
-          EST. 2004 — COIMBATORE, IN
+          EST. 1998 — COIMBATORE, IN
         </div>
 
         {/* Content */}

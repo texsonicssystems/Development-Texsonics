@@ -40,7 +40,7 @@ from generate_catalogues import (  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 LOGO_PATH = ROOT / "src" / "assets" / "texsonics-logo.png"
-FACTORY_IMG = ASSETS / "workshop-air6.jpg"
+FACTORY_IMG = ROOT / "src" / "assets" / "coimbatore-works-hero.jpg"
 OUT_PATH = Path("C:/Texsonics/texsonics-portfolio.pdf")
 
 
@@ -110,9 +110,26 @@ class Flow:
 # ---------- section drawers ------------------------------------------------
 def sec_cover(flow):
     """Cover-style hero: series chip, kicker, big display, tagline paragraph,
-    then the feature strip."""
-    y = flow.y
+    then the feature strip. Company logo stamped in the top-right corner."""
+    y_chip = flow.y
 
+    # Logo top-right (aligned with the chip vertical)
+    if LOGO_PATH.exists():
+        logo = Image.open(LOGO_PATH).convert("RGBA")
+        target_h = 22 * mm
+        aspect = logo.width / logo.height
+        target_w = target_h * aspect
+        # cap width so it doesn't collide with center
+        max_w = 55 * mm
+        if target_w > max_w:
+            target_w = max_w
+            target_h = target_w / aspect
+        lx = PAGE_W - MARGIN_X - target_w
+        ly = flow.y - target_h + 4 * mm
+        flow.c.drawImage(ImageReader(logo), lx, ly, target_w, target_h,
+                         mask="auto")
+
+    y = y_chip
     # Chip
     label = "COMPANY PORTFOLIO"
     flow.c.setFont(MONO_BOLD, 7.5)
@@ -143,7 +160,7 @@ def sec_cover(flow):
     desc = ("Texsonics designs, manufactures and supports industrial robot "
             "arms, collaborative robots, autonomous mobile robots, and the "
             "controller and CAM software that drive them — entirely from "
-            "our Coimbatore facility. 25+ years of precision engineering, "
+            "our Coimbatore facility. 27+ years of precision engineering, "
             "one integrated stack.")
     y = draw_wrapped(flow.c, desc, MARGIN_X, y, CONTENT_W - 20 * mm,
                      SANS, 10.5, MUTED, leading=14)
@@ -151,9 +168,9 @@ def sec_cover(flow):
 
     # Feature strip (4 pillars)
     features = [
-        ("Founded 2004", "Coimbatore, Tamil Nadu · 25+ years engineering"),
+        ("Founded 1998", "Coimbatore, Tamil Nadu · 27+ years engineering"),
         ("Whole Stack", "Arm · controller · drives · pendant · CAM"),
-        ("100+ Team", "Mechanical, electrical, firmware, software"),
+        ("20+ Team", "Mechanical, electrical, firmware, software"),
         ("150+ Customers", "Automotive, foundries, machine builders, OEMs"),
     ]
     n = len(features)
@@ -184,15 +201,15 @@ def sec_at_a_glance(flow):
 
     left_rows = [
         ("LEGAL NAME", "Texsonics Systems India Private Limited"),
-        ("FOUNDED", "2004"),
+        ("FOUNDED", "1998"),
         ("HEAD OFFICE", "Coimbatore, Tamil Nadu, India"),
         ("FACILITY", "25,000 sq.ft manufacturing works"),
-        ("TEAM", "100+ engineers and technicians"),
+        ("TEAM", "20+ engineers and technicians"),
     ]
     right_rows = [
         ("SECTORS", "Industrial robotics, factory automation"),
         ("CUSTOMERS", "150+ across India and export markets"),
-        ("EXPORTS", "UAE · Singapore · Malaysia · South Africa"),
+        ("EXPORTS", "UAE · Singapore · Malaysia · Indonesia · South Africa"),
         ("CERTIFICATIONS", "ISO-aligned engineering & QA processes"),
         ("BUSINESS TYPE", "OEM · turnkey integrator · service"),
     ]
@@ -216,7 +233,7 @@ def sec_who_we_are(flow):
     right_w = CONTENT_W - left_w - 8 * mm
 
     # Left — big statement + paragraph
-    statement = "25 Years of engineering. Now building robots."
+    statement = "27 Years of engineering. Now building robots."
     flow.c.setFillColor(INK)
     flow.c.setFont(SANS_BOLD, 20)
     yl = y_top
@@ -224,13 +241,13 @@ def sec_who_we_are(flow):
         flow.c.drawString(MARGIN_X, yl, line); yl -= 24
     yl -= 4 * mm
     para = (
-        "Founded in 2004 in Coimbatore, Texsonics spent two decades "
-        "mastering precision manufacturing for automation, machine "
-        "building and OEM customers. That discipline — tight tolerances, "
-        "fast turnarounds, everything under one roof — is exactly what "
-        "building robots demands. Today robotics is our focus, and every "
-        "arm, controller, pendant, and software layer is designed and "
-        "supported by our own engineers."
+        "Founded in 1998 in Coimbatore, Texsonics spent over two decades "
+        "as a precision sheet-metal fabrication and automation-support "
+        "partner for OEMs and machine builders. That discipline — tight "
+        "tolerances, fast turnarounds, everything under one roof — is "
+        "exactly what building robots demands. Today robotics is our "
+        "focus, and every arm, controller, pendant, and software layer "
+        "is designed and supported by our own engineers."
     )
     yl = draw_wrapped(flow.c, para, MARGIN_X, yl, left_w,
                       SANS, 9.6, MUTED, leading=13)
@@ -245,8 +262,9 @@ def sec_who_we_are(flow):
          "scoping, integration, operator training — one team, one throat "
          "to choke."),
         ("PRECISION HERITAGE",
-         "25+ years of tight-tolerance manufacturing discipline now applied "
-         "to robot arms, drives, and motion controllers."),
+         "27+ years of tight-tolerance sheet-metal and precision "
+         "manufacturing discipline now applied to robot arms, drives, "
+         "and motion controllers."),
     ]
     yr = y_top
     for idx, (title, body) in enumerate(items, start=1):
@@ -286,7 +304,7 @@ def sec_workshop_hero(flow):
     flow.c.setFillColor(MUTED)
     flow.c.setFont(MONO, 7.6)
     flow.c.drawString(MARGIN_X, photo_top - target_h - 4 * mm,
-                      "25,000 SQ.FT MANUFACTURING FACILITY · KEERANATHAM, COIMBATORE")
+                      "INDIGENOUS ROBOT CONTROLLER · DIGITAL TWIN · KEERANATHAM, COIMBATORE")
     flow.y = photo_top - target_h - 10 * mm
 
 
@@ -308,22 +326,22 @@ def sec_milestones(flow):
     flow.ensure(55 * mm)
     flow.y = draw_section_head(flow.c, 4, "Milestones", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 4 * mm
-    intro = ("Twenty years from a precision-engineering shop to a full-stack "
-             "robotics manufacturer.")
+    intro = ("Twenty-seven years from a precision sheet-metal fabricator "
+             "to a full-stack robotics manufacturer.")
     flow.y = draw_wrapped(flow.c, intro, MARGIN_X, flow.y - 2 * mm,
                           CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
     flow.y -= 4 * mm
 
     items = [
-        ("2004",  "Founded in Coimbatore. Precision engineering for "
-                  "OEMs and machine builders."),
-        ("2010s", "Two decades of automation-grade manufacturing, "
-                  "tighter tolerances every year."),
-        ("2022",  "R&D program launched for a fully in-house robot "
-                  "controller and pendant."),
-        ("2024",  "RC series controller and TEXCAM programming "
+        ("1998",  "Founded in Coimbatore as a precision sheet-metal "
+                  "fabrication company."),
+        ("2000s", "Enclosures, machine covers, control panels and "
+                  "sheet-metal parts for OEMs and machine builders."),
+        ("2020s", "Pivoted focus toward automation — cell design, "
+                  "controllers and turnkey integration."),
+        ("2024",  "RC series robot controller and TEXCAM programming "
                   "platform completed."),
-        ("Today", "Building 4-6 axis arms, cobots, and AMRs — with our "
+        ("Today", "Building 4-6 axis arms, cobots and AMRs — with our "
                   "own controller and CAM."),
     ]
     n = len(items)
@@ -559,7 +577,7 @@ def sec_global_reach(flow):
 
     countries = [
         "India", "United Arab Emirates", "Singapore", "Malaysia",
-        "South Africa", "Sri Lanka", "Bangladesh", "Oman",
+        "Indonesia", "South Africa",
     ]
     flow.y = draw_chip_cloud(flow.c, countries, MARGIN_X, flow.y, CONTENT_W)
     flow.y -= 6 * mm
@@ -567,9 +585,9 @@ def sec_global_reach(flow):
     # Stats row — 4 tall stats
     stats = [
         ("150+", "customers served"),
-        ("8", "countries reached"),
-        ("100+", "engineers on staff"),
-        ("25 yr", "precision heritage"),
+        ("6", "countries reached"),
+        ("20+", "engineers on staff"),
+        ("27 yr", "precision heritage"),
     ]
     n = len(stats)
     gap = 6 * mm

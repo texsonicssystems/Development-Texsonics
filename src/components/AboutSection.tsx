@@ -119,7 +119,7 @@ const AboutSection = () => {
               Most robot suppliers assemble someone else's arm around someone
               else's controller. We don't. Texsonics designs and manufactures the
               complete stack — mechanics, electronics, and software — backed by
-              25+ years of engineering in Coimbatore.
+              27+ years of engineering in Coimbatore.
             </p>
             <p className="about-item text-muted-foreground mb-10 max-w-lg leading-relaxed">
               That means higher payload per rupee, custom engineering without

@@ -5,10 +5,12 @@ import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { robots } from "@/data/robots";
+import { useDownloadGate } from "@/components/DownloadGate";
 
 const RobotDetail = () => {
   const { id } = useParams<{ id: string }>();
   const robot = robots.find((r) => r.id === id);
+  const requestDownload = useDownloadGate();
 
   if (!robot) {
     return (
@@ -179,14 +181,20 @@ const RobotDetail = () => {
                   <ArrowRight className="relative z-10 w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:text-background" />
                 </Link>
                 {robot.catalogue ? (
-                  <a
-                    href={robot.catalogue}
-                    download={`Texsonics-${robot.model}.pdf`}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      requestDownload({
+                        url: robot.catalogue!,
+                        filename: `Texsonics-${robot.model}.pdf`,
+                        label: `${robot.model} catalogue`,
+                      })
+                    }
                     className="group flex-1 inline-flex items-center justify-center gap-3 border border-border text-foreground font-display font-semibold uppercase tracking-wider text-sm px-8 py-4 hover:border-primary hover:text-primary transition-colors duration-300"
                   >
                     Download Catalogue
                     <ArrowUpRight className="w-4 h-4" />
-                  </a>
+                  </button>
                 ) : (
                   <Link
                     to="/downloads"
