@@ -303,11 +303,66 @@ def _draw_photo(c, path, x, y_top, w, h):
         c.drawImage(ImageReader(im), dx, dy, dw, dh, mask="auto")
 
 
+def sec_milestones(flow):
+    """Horizontal timeline strip: 5 cells, each with mono year + short note."""
+    flow.ensure(55 * mm)
+    flow.y = draw_section_head(flow.c, 4, "Milestones", MARGIN_X, flow.y - 2 * mm)
+    flow.y -= 4 * mm
+    intro = ("Twenty years from a precision-engineering shop to a full-stack "
+             "robotics manufacturer.")
+    flow.y = draw_wrapped(flow.c, intro, MARGIN_X, flow.y - 2 * mm,
+                          CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
+    flow.y -= 4 * mm
+
+    items = [
+        ("2004",  "Founded in Coimbatore. Precision engineering for "
+                  "OEMs and machine builders."),
+        ("2010s", "Two decades of automation-grade manufacturing, "
+                  "tighter tolerances every year."),
+        ("2022",  "R&D program launched for a fully in-house robot "
+                  "controller and pendant."),
+        ("2024",  "RC series controller and TEXCAM programming "
+                  "platform completed."),
+        ("Today", "Building 4-6 axis arms, cobots, and AMRs — with our "
+                  "own controller and CAM."),
+    ]
+    n = len(items)
+    gap = 4 * mm
+    tile_w = (CONTENT_W - gap * (n - 1)) / n
+    tile_h = 52 * mm
+    y_top = flow.y
+
+    for i, (year, note) in enumerate(items):
+        x = MARGIN_X + i * (tile_w + gap)
+        # tinted card
+        flow.c.setFillColor(TINT)
+        flow.c.rect(x, y_top - tile_h, tile_w, tile_h, fill=1, stroke=0)
+        # cyan top bar
+        flow.c.setFillColor(CYAN)
+        flow.c.rect(x, y_top - 2, tile_w, 2, fill=1, stroke=0)
+        # step number mono
+        flow.c.setFillColor(CYAN_INK)
+        flow.c.setFont(MONO_BOLD, 7.5)
+        flow.c.drawString(x + 4 * mm, y_top - 6 * mm, f"STEP {i+1:02d}")
+        # year (big display)
+        flow.c.setFillColor(INK)
+        flow.c.setFont(SANS_BOLD, 16)
+        flow.c.drawString(x + 4 * mm, y_top - 14 * mm, year)
+        # note wrapped — larger area, no truncation
+        flow.c.setFillColor(MUTED)
+        flow.c.setFont(SANS, 8.4)
+        yy = y_top - 20 * mm
+        for line in wrap(note, tile_w - 8 * mm, SANS, 8.4, flow.c):
+            flow.c.drawString(x + 4 * mm, yy, line); yy -= 10.5
+
+    flow.y = y_top - tile_h - 6 * mm
+
+
 def sec_the_stack(flow):
     """4-column integration strip — same widget as the catalogue's
     Control & Integration section, but framed as the company stack."""
     flow.ensure(52 * mm)
-    flow.y = draw_section_head(flow.c, 4, "The Stack", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 5, "The Stack", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 4 * mm
     stack = [
         ("MECHANICAL", "Robot arms & AMRs",
@@ -367,7 +422,7 @@ def sec_robot_lineup(flow):
          "AUTONOMOUS · 300 kg PAYLOAD"),
     ]
     flow.ensure(55 * mm)
-    flow.y = draw_section_head(flow.c, 5, "Robot Lineup", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 6, "Robot Lineup", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 4 * mm
     intro = ("Seven robot platforms in production — 4- and 6-axis industrial "
              "arms, a SCARA, a collaborative robot, and an AMR — each with a "
@@ -433,7 +488,7 @@ def sec_industries(flow):
         "Engineering Components", "Machine Builders", "Stamping", "OEMs",
     ]
     flow.ensure(40 * mm)
-    flow.y = draw_section_head(flow.c, 6, "Industries Served", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 7, "Industries Served", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 2 * mm
     intro = ("From automotive line automation to foundry press-tending, we "
              "engineer cells that hold up on real factory floors — not lab "
@@ -452,7 +507,7 @@ def sec_applications(flow):
         "Material Handling", "Vision Inspection", "Pick & Place",
     ]
     flow.ensure(40 * mm)
-    flow.y = draw_section_head(flow.c, 7, "Applications", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 8, "Applications", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 2 * mm
     flow.y = draw_chip_cloud(flow.c, apps, MARGIN_X, flow.y, CONTENT_W)
     flow.y -= 4 * mm
@@ -469,7 +524,7 @@ def sec_capabilities(flow):
         "Field service & AMC", "Spares from Coimbatore",
     ]
     flow.ensure(60 * mm)
-    flow.y = draw_section_head(flow.c, 8, "Capabilities", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 9, "Capabilities", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 4 * mm
     col_w = (CONTENT_W - 12 * mm) / 2
     rows_per_col = (len(caps) + 1) // 2
@@ -489,11 +544,163 @@ def sec_capabilities(flow):
     flow.y = y_top - rows_per_col * 8 * mm - 4 * mm
 
 
+def sec_global_reach(flow):
+    """Countries served + a 4-cell stats row underneath."""
+    flow.ensure(70 * mm)
+    flow.y = draw_section_head(flow.c, 10, "Global Reach", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 2 * mm
+    intro = ("Beyond India, our robots and cells ship to customers across "
+             "the Gulf, South-East Asia and Africa — installed and "
+             "commissioned by our own engineers.")
+    flow.y = draw_wrapped(flow.c, intro, MARGIN_X, flow.y - 2 * mm,
+                          CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
+    flow.y -= 4 * mm
+
+    countries = [
+        "India", "United Arab Emirates", "Singapore", "Malaysia",
+        "South Africa", "Sri Lanka", "Bangladesh", "Oman",
+    ]
+    flow.y = draw_chip_cloud(flow.c, countries, MARGIN_X, flow.y, CONTENT_W)
+    flow.y -= 6 * mm
+
+    # Stats row — 4 tall stats
+    stats = [
+        ("150+", "customers served"),
+        ("8", "countries reached"),
+        ("100+", "engineers on staff"),
+        ("25 yr", "precision heritage"),
+    ]
+    n = len(stats)
+    gap = 6 * mm
+    tile_w = (CONTENT_W - gap * (n - 1)) / n
+    tile_h = 28 * mm
+    y_top = flow.y
+    for i, (num, note) in enumerate(stats):
+        x = MARGIN_X + i * (tile_w + gap)
+        flow.c.setFillColor(TINT)
+        flow.c.rect(x, y_top - tile_h, tile_w, tile_h, fill=1, stroke=0)
+        flow.c.setFillColor(CYAN)
+        flow.c.rect(x, y_top - 2, tile_w, 2, fill=1, stroke=0)
+        flow.c.setFillColor(INK)
+        flow.c.setFont(SANS_BOLD, 26)
+        flow.c.drawString(x + 5 * mm, y_top - 15 * mm, num)
+        # Small MONO caption — full note across two lines if needed
+        flow.c.setFillColor(MUTED)
+        flow.c.setFont(MONO, 7.2)
+        yy = y_top - 21 * mm
+        for line in wrap(note.upper(), tile_w - 10 * mm, MONO, 7.2, flow.c)[:2]:
+            flow.c.drawString(x + 5 * mm, yy, line); yy -= 9
+    flow.y = y_top - tile_h - 6 * mm
+
+
+def sec_our_approach(flow):
+    """4-column numbered process — Discover, Design, Deliver, Support."""
+    flow.ensure(56 * mm)
+    flow.y = draw_section_head(flow.c, 11, "Our Approach", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 4 * mm
+    intro = ("From first conversation to line hand-over, every project runs "
+             "through the same four-phase engagement — cell scoping, "
+             "engineering, deployment, and ongoing support.")
+    flow.y = draw_wrapped(flow.c, intro, MARGIN_X, flow.y - 2 * mm,
+                          CONTENT_W - 20 * mm, SANS, 10, MUTED, leading=13)
+    flow.y -= 4 * mm
+
+    phases = [
+        ("DISCOVER", "Process study",
+         "Site visits, cycle-time capture, ROI sizing, and layout "
+         "concepts — before quoting."),
+        ("DESIGN", "Cell engineering",
+         "Robot selection, end-of-arm tooling, safety design, fieldbus "
+         "and vision integration."),
+        ("DELIVER", "Build & install",
+         "Cell fabrication, wiring, software, factory acceptance, on-site "
+         "commissioning and operator training."),
+        ("SUPPORT", "Ongoing service",
+         "Preventive AMC, spares, remote diagnostics and pan-India "
+         "field service on 24-hour dispatch."),
+    ]
+    col_w = (CONTENT_W - 3 * 6 * mm) / 4
+    y_top = flow.y
+    block_h = 40 * mm
+
+    for i, (num, headline, body) in enumerate(phases):
+        x = MARGIN_X + i * (col_w + 6 * mm)
+        # step badge
+        flow.c.setFillColor(CYAN)
+        flow.c.rect(x, y_top - 5.5 * mm, 12 * mm, 5.5 * mm, fill=1, stroke=0)
+        flow.c.setFillColor(INK)
+        flow.c.setFont(MONO_BOLD, 7.5)
+        flow.c.drawString(x + 2 * mm, y_top - 3.7 * mm, f"0{i+1} · {num}")
+
+        # headline
+        flow.c.setFillColor(INK)
+        flow.c.setFont(SANS_BOLD, 11)
+        hl_lines = wrap(headline, col_w, SANS_BOLD, 11, flow.c)
+        yy = y_top - 12 * mm
+        for line in hl_lines:
+            flow.c.drawString(x, yy, line); yy -= 12.5
+
+        # body
+        flow.c.setFillColor(MUTED)
+        flow.c.setFont(SANS, 8.6)
+        for line in wrap(body, col_w, SANS, 8.6, flow.c):
+            flow.c.drawString(x, yy, line); yy -= 11
+
+        # vertical dashed divider between phases
+        if i < 3:
+            flow.c.setStrokeColor(HAIRLINE)
+            flow.c.setLineWidth(0.5)
+            flow.c.setDash(2, 3)
+            flow.c.line(x + col_w + 3 * mm, y_top + 2 * mm,
+                        x + col_w + 3 * mm, y_top - block_h + 4 * mm)
+            flow.c.setDash()
+
+    flow.y = y_top - block_h - 4 * mm
+
+
+def sec_standards_and_quality(flow):
+    """Two-column mono-label table showing standards / quality practices."""
+    flow.ensure(72 * mm)
+    flow.y = draw_section_head(flow.c, 12, "Standards & Quality", MARGIN_X,
+                               flow.y - 2 * mm)
+    flow.y -= 2 * mm
+
+    left_rows = [
+        ("DESIGN REVIEW", "Multi-stage review across mechanical, "
+                          "electrical and firmware disciplines"),
+        ("MATERIALS", "Traceable steel, aluminium and casting supply chain"),
+        ("PRECISION MACHINING", "In-house CNC + inspection ensures "
+                                "±0.02 mm arm accuracy"),
+        ("MOTION TUNING", "Every arm calibrated on our own test rigs "
+                          "before shipment"),
+        ("ELECTRICAL SAFETY", "IEC 60204-1 aligned wiring, dual-channel "
+                              "E-stop, safety-rated I/O"),
+    ]
+    right_rows = [
+        ("QMS", "ISO-aligned quality management processes"),
+        ("FAT", "Full factory acceptance test before dispatch — "
+                "documented and video-recorded"),
+        ("SAT", "On-site acceptance with customer sign-off"),
+        ("DOCUMENTATION", "Wiring diagrams, part lists, backup images "
+                          "and full user manuals ship with every unit"),
+        ("WARRANTY", "12 months mechanical + 12 months controller, with "
+                     "pan-India on-site service"),
+    ]
+    col_w = (CONTENT_W - 12 * mm) / 2
+    y_l = draw_spec_column(flow.c, "Engineering", left_rows,
+                           MARGIN_X, flow.y, col_w)
+    y_r = draw_spec_column(flow.c, "Quality & Delivery", right_rows,
+                           MARGIN_X + col_w + 12 * mm, flow.y, col_w)
+    flow.y = min(y_l, y_r) - 8 * mm
+
+
 def sec_ready_to_talk(flow):
     """Cyan-tinted CTA panel like the catalogue's Ready to Integrate."""
     panel_h = 55 * mm
     flow.ensure(panel_h + 12 * mm)
-    flow.y = draw_section_head(flow.c, 9, "Ready to Talk", MARGIN_X, flow.y - 2 * mm)
+    flow.y = draw_section_head(flow.c, 13, "Ready to Talk", MARGIN_X, flow.y - 2 * mm)
     flow.y -= 4 * mm
     y_top = flow.y
     flow.c.setFillColor(HexColor("#E7FAFE"))
@@ -592,11 +799,15 @@ def _fill(flow):
     sec_at_a_glance(flow)
     sec_who_we_are(flow)
     sec_workshop_hero(flow)
+    sec_milestones(flow)
     sec_the_stack(flow)
     sec_robot_lineup(flow)
     sec_industries(flow)
     sec_applications(flow)
     sec_capabilities(flow)
+    sec_global_reach(flow)
+    sec_our_approach(flow)
+    sec_standards_and_quality(flow)
     sec_ready_to_talk(flow)
     sec_disclaimer_and_callout(flow)
 

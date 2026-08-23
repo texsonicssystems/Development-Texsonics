@@ -271,33 +271,41 @@ def draw_spec_column(c, category, rows, x, y_top, col_w, label_font_size=7.4,
     label_col_w = col_w * 0.40
     value_col_w = col_w - label_col_w - 4 * mm
 
+    # In ReportLab, drawString baseline is AT `y`, so characters ascend
+    # ABOVE y. To keep both columns top-aligned inside the row (and to
+    # keep the dashed separator BELOW all glyphs — not crossing the next
+    # row's ascenders) we compute row height from whichever column needs
+    # more lines, and offset the first baseline down by the leading.
     for i, (lbl, val) in enumerate(rows):
-        # Prep value wrap
         val_lines = wrap(val, value_col_w, SANS, value_font_size, c)
-        block_h = max(len(val_lines), 1) * (value_font_size * 1.35) + 2 * mm
-        block_h = max(block_h, row_gap)
+        lbl_lines = wrap(lbl.upper(), label_col_w, MONO, label_font_size, c)
 
-        # Draw mono label (uppercase, top-aligned)
+        val_leading = value_font_size * 1.35
+        lbl_leading = label_font_size * 1.35
+        content_h = max(len(val_lines) * val_leading,
+                        len(lbl_lines) * lbl_leading)
+        # small padding covers ascender/descender + spacing between rows
+        row_h = max(content_h + 1.6 * mm, row_gap)
+
+        # Label — baseline of first line one leading below row top
         c.setFillColor(MUTED)
         c.setFont(MONO, label_font_size)
-        # wrap label to label_col_w too — keeps things tidy
-        lbl_lines = wrap(lbl.upper(), label_col_w, MONO, label_font_size, c)
-        ly = y
+        ly = y - lbl_leading + 1.5
         for line in lbl_lines:
             c.drawString(x, ly, line)
-            ly -= label_font_size * 1.35
+            ly -= lbl_leading
 
-        # Value (regular sans, near-black)
+        # Value — baseline of first line one leading below row top
         c.setFillColor(INK)
         c.setFont(SANS, value_font_size)
-        vy = y
+        vy = y - val_leading + 1.5
         for line in val_lines:
             c.drawString(x + label_col_w + 4 * mm, vy, line)
-            vy -= value_font_size * 1.35
+            vy -= val_leading
 
-        y -= block_h
-        # dashed row separator
-        draw_dashed_hairline(c, x, y + 1.5 * mm, col_w)
+        y -= row_h
+        # dashed row separator sits at row bottom, safely below descenders
+        draw_dashed_hairline(c, x, y + 1 * mm, col_w)
 
     return y
 
